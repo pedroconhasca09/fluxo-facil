@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Dashboard de Gestão de Gastos e Finanças Pessoais - controle suas entradas, saídas e saldo com gráficos e tabela interativa." />
+  <title>Dashboard de Finanças Pessoais</title>
+  <link rel="icon" href="assets/images/financas-app-foto.png" />
+  <link rel="stylesheet" href="assets/css/global.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/components.css" />
+</head>
+<body>
+  <!--
+    Skip Link (WCAG 2.4.1 - Bypass Blocks):
+    Permite que usuários de teclado pulem direto para o conteúdo principal,
+    evitando ter que tabular por todo o cabeçalho a cada navegação de página.
+    Fica visualmente oculto até receber foco via Tab.
+  -->
+  <a href="#conteudo-principal" class="skip-link">Pular para o conteúdo principal</a>
+
+  <header class="app-header">
+    <div class="app-header__brand">
+      <img class="app-header__logo" alt="Logo do aplicativo" src="assets/images/financas-app-foto.png" />
+    </div>
+
+    <!--
+      Botão de alternância de tema. `aria-pressed` comunica o estado (ligado/desligado)
+      para tecnologias assistivas, já que o ícone sozinho não é suficiente.
+    -->
+    <button
+      type="button"
+      id="btn-tema"
+      class="btn btn--icon"
+      aria-pressed="false"
+      aria-label="Alternar para modo escuro"
+      title="Alternar tema claro/escuro"
+    >
+      <span id="icone-tema" aria-hidden="true">🌙</span>
+    </button>
+  </header>
+
+  <p id="aviso-sistema" class="aviso-sistema" role="status" aria-live="polite" hidden></p>
+
+  <!-- Script clássico (não-module): detecta file:// e falhas silenciosas de boot antes do app.js -->
+  <script src="src/js/boot-check.js"></script>
+
+  <main id="conteudo-principal" class="app-main">
+    <!-- ===================== RESUMO FINANCEIRO ===================== -->
+    <section class="area-resumo" aria-labelledby="titulo-resumo">
+      <h2 id="titulo-resumo" class="sr-only">Resumo financeiro</h2>
+
+      <!--
+        aria-live="polite": sempre que o saldo, entradas ou saídas mudarem via JS,
+        leitores de tela anunciarão a atualização sem interromper o usuário,
+        essencial para uma aplicação dinâmica sem recarregar a página.
+      -->
+      <div class="cards-resumo" aria-live="polite" aria-atomic="false">
+        <article class="card card--saldo">
+          <h3 class="card__titulo">Saldo Atual</h3>
+          <p class="card__valor" id="valor-saldo">R$ 0,00</p>
+        </article>
+
+        <article class="card card--entrada">
+          <h3 class="card__titulo">Entradas</h3>
+          <p class="card__valor" id="valor-entradas">R$ 0,00</p>
+        </article>
+
+        <article class="card card--saida">
+          <h3 class="card__titulo">Saídas</h3>
+          <p class="card__valor" id="valor-saidas">R$ 0,00</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===================== FORMULÁRIO DE LANÇAMENTO ===================== -->
+    <section class="area-formulario" aria-labelledby="titulo-formulario">
+      <h2 id="titulo-formulario">Nova Transação</h2>
+
+      <form id="form-transacao" class="formulario" novalidate>
+        <div class="campo">
+          <label for="input-descricao">Descrição</label>
+          <input
+            type="text"
+            id="input-descricao"
+            name="descricao"
+            placeholder="Ex.: Supermercado"
+            required
+            minlength="2"
+            maxlength="60"
+            aria-describedby="erro-descricao"
+          />
+          <span id="erro-descricao" class="mensagem-erro" role="alert"></span>
+        </div>
+
+        <div class="campo">
+          <label for="input-valor">Valor (R$)</label>
+          <input
+            type="number"
+            id="input-valor"
+            name="valor"
+            placeholder="0,00"
+            step="0.01"
+            min="0.01"
+            required
+            aria-describedby="erro-valor"
+          />
+          <span id="erro-valor" class="mensagem-erro" role="alert"></span>
+        </div>
+
+        <div class="campo">
+          <label for="input-tipo">Tipo</label>
+          <select id="input-tipo" name="tipo" required>
+            <option value="entrada">Entrada</option>
+            <option value="saida">Saída</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="input-categoria">Categoria</label>
+          <select id="input-categoria" name="categoria" required>
+            <option value="alimentacao">Alimentação</option>
+            <option value="moradia">Moradia</option>
+            <option value="transporte">Transporte</option>
+            <option value="saude">Saúde</option>
+            <option value="lazer">Lazer</option>
+            <option value="educacao">Educação</option>
+            <option value="salario">Salário</option>
+            <option value="outros">Outros</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="input-data">Data</label>
+          <input type="date" id="input-data" name="data" required />
+        </div>
+
+        <button type="submit" class="btn btn--primario">
+          Adicionar transação
+        </button>
+      </form>
+    </section>
+
+    <!-- ===================== GRÁFICO ===================== -->
+    <section class="area-grafico" aria-labelledby="titulo-grafico">
+      <h2 id="titulo-grafico">Distribuição de Gastos por Categoria</h2>
+      <div class="chart-container">
+        <canvas
+          id="grafico-categorias"
+          role="img"
+          aria-label="Gráfico de pizza representando a distribuição das transações por categoria"
+        ></canvas>
+        <p id="grafico-vazio" class="grafico-vazio" hidden>
+          Nenhuma transação cadastrada ainda para exibir no gráfico.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== TABELA DE TRANSAÇÕES ===================== -->
+    <section class="area-transacoes" aria-labelledby="titulo-transacoes">
+      <h2 id="titulo-transacoes">Histórico de Transações</h2>
+
+      <div class="tabela-wrapper">
+        <table class="tabela-transacoes">
+          <caption class="sr-only">
+            Lista de todas as transações cadastradas, com descrição, categoria, tipo, valor, data e ação de exclusão.
+          </caption>
+          <thead>
+            <tr>
+              <th scope="col">Descrição</th>
+              <th scope="col">Categoria</th>
+              <th scope="col">Tipo</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Data</th>
+              <th scope="col">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="corpo-tabela-transacoes">
+            <!-- Linhas geradas dinamicamente via JavaScript (ver src/js/ui.js) -->
+          </tbody>
+        </table>
+
+        <p id="tabela-vazia" class="tabela-vazia" hidden>
+          Nenhuma transação cadastrada. Utilize o formulário acima para começar.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>
+       &copy; Desenvolvido para fins de estudo e portfólio por Pedro Conhasca - <abbr title="HyperText Markup Language">HTML5</abbr>, <abbr title="Cascading Style Sheets">CSS3</abbr> e Javascript.
+    </p>
+  </footer>
+
+  <!--
+    Chart.js via CDN. Carregado antes do módulo da aplicação pois src/js/chart.js
+    depende do objeto global `Chart` já estar disponível no escopo da página.
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+  <!--
+    type="module" habilita import/export nativo (ES6 Modules), permitindo dividir
+    a aplicação em arquivos coesos e de responsabilidade única (ver src/js/).
+  -->
+  <script type="module" src="src/js/app.js"></script>
+</body>
+</html>

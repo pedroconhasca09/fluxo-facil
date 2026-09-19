@@ -1,0 +1,127 @@
+/* ==========================================================================
+   LAYOUT.CSS
+   Responsabilidade: estrutura macro da página — header, grid principal do
+   dashboard, footer e áreas nomeadas do CSS Grid.
+
+   Por que CSS Grid para o layout principal?
+   O dashboard tem regiões com tamanhos e posições distintas (resumo, form,
+   gráfico, tabela). `grid-template-areas` deixa essa relação espacial
+   legível diretamente no CSS, funcionando como um "mapa" do layout.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   HEADER
+   -------------------------------------------------------------------------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.app-header__logo {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 5%;
+}
+
+.app-header__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   GRID PRINCIPAL DO DASHBOARD
+   Mobile-first: em telas pequenas, todas as áreas empilham em uma coluna.
+   -------------------------------------------------------------------------- */
+.app-main {
+  display: grid;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  max-width: 1200px;
+  margin-inline: auto;
+
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "resumo"
+    "formulario"
+    "grafico"
+    "transacoes";
+}
+
+/* min-width: 0 evita que o item do grid cresça pelo min-content de filhos (ex.: tabela larga) */
+.area-resumo {
+  grid-area: resumo;
+  min-width: 0;
+}
+
+.area-formulario {
+  grid-area: formulario;
+  min-width: 0;
+}
+
+.area-grafico {
+  grid-area: grafico;
+  min-width: 0;
+}
+
+.area-transacoes {
+  grid-area: transacoes;
+  min-width: 0;
+}
+
+/*
+  Em telas médias/grandes, reorganizamos em duas colunas: formulário e
+  gráfico lado a lado, com resumo no topo e tabela ocupando a largura total.
+*/
+@media (min-width: 900px) {
+  .app-main {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "resumo    resumo"
+      "formulario grafico"
+      "transacoes transacoes";
+  }
+}
+
+/* --------------------------------------------------------------------------
+   FOOTER
+   -------------------------------------------------------------------------- */
+.app-footer {
+  text-align: center;
+  padding: var(--spacing-lg);
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* --------------------------------------------------------------------------
+   AJUSTES PARA TELAS PEQUENAS (SMARTPHONES)
+   -------------------------------------------------------------------------- */
+@media (max-width: 599px) {
+  .app-header {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .app-header__logo {
+    width: 56px;
+    height: 56px;
+  }
+
+  .app-main {
+    padding: var(--spacing-md);
+  }
+}
