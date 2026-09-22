@@ -160,8 +160,3 @@ npx serve .
 - [ ] Testes automatizados (unitários) para os módulos de `state.js` e `utils/helpers.js`
 - [ ] Internacionalização (i18n) para outros idiomas/moedas
 
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT — sinta-se livre para estudar, copiar e adaptar o código.
