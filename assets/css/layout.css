@@ -42,6 +42,11 @@
   font-size: 1.25rem;
   font-weight: 700;
 }
+.app-header__title{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 /* --------------------------------------------------------------------------
    GRID PRINCIPAL DO DASHBOARD
